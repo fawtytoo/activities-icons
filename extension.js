@@ -1,7 +1,8 @@
 const Main = imports.ui.main;
-const Lang = imports.lang;
 const PanelMenu = imports.ui.panelMenu;
 const St = imports.gi.St;
+const Clutter = imports.gi.Clutter;
+const Meta = imports.gi.Meta;
 
 let activities;
 let button;
@@ -11,20 +12,24 @@ class ActivitiesIcons extends PanelMenu.Button
 {
     _init()
     {
-        super._init();
+        super._init(0.0, null, true);
+
+        this.wm = global.workspace_manager;
 
         this.box = new St.BoxLayout({style_class: 'activity-box'});
 
         this.appButton = new St.Button();
         this.appIcon = new St.Icon({icon_name: 'view-app-grid-symbolic', style_class: 'activity-icon'});
         this.appButton.add_actor(this.appIcon);
-        this.appButton.connect('clicked', Lang.bind(this, this._showApplications));
+        this.appButton.connect('clicked', () => this._changePage(true));
+        this.appButton.connect('scroll-event', (actor, event) => this._scrollWindows(actor, event));
         this.box.add_actor(this.appButton);
 
         this.overButton = new St.Button();
         this.overIcon = new St.Icon({icon_name: 'focus-windows-symbolic', style_class: 'activity-icon'});
         this.overButton.add_actor(this.overIcon);
-        this.overButton.connect('clicked', Lang.bind(this, this._showWorkspaces));
+        this.overButton.connect('clicked', () => this._changePage(false));
+        this.overButton.connect('scroll-event', (actor, event) => this._scrollWorkspace(actor, event));
         this.box.add_actor(this.overButton);
 
         this.actor.add_child(this.box);
@@ -53,16 +58,50 @@ class ActivitiesIcons extends PanelMenu.Button
             Main.overview.viewSelector._showAppsButtonToggled();
     }
 
-    _showApplications()
+    _scrollWindows(actor, event)
     {
-        this._changePage(true);
+        let workspace = this.wm.get_active_workspace();
+        let windows = global.display.get_tab_list(Meta.TabList.NORMAL_ALL, workspace);
+        if (windows.length < 2)
+            return;
+
+        switch (event.get_scroll_direction())
+        {
+          case Clutter.ScrollDirection.UP:
+            windows[windows.length - 1].activate(global.get_current_time());
+            break;
+          case Clutter.ScrollDirection.DOWN:
+            windows[windows.length - windows.length > 2 ? 2 : 1].activate(global.get_current_time());
+            //windows[0].lower(); // the windows loses focus using this method
+            break;
+        }
+
+        return Clutter.EVENT_STOP;
     }
 
-    _showWorkspaces()
+    _scrollWorkspace(actor, event)
     {
-        this._changePage(false);
+        let workspace = this.wm.get_active_workspace();
+
+        switch (event.get_scroll_direction())
+        {
+          case Clutter.ScrollDirection.UP:
+            if (workspace.index() == 0)
+                return;
+            else
+                workspace.get_neighbor(Meta.MotionDirection.UP).activate(global.get_current_time());
+            break;
+          case Clutter.ScrollDirection.DOWN:
+            if (workspace.index() + 1 == this.wm.n_workspaces)
+                return;
+            else
+                workspace.get_neighbor(Meta.MotionDirection.DOWN).activate(global.get_current_time());
+            break;
+        }
+
+        return Clutter.EVENT_STOP;
     }
-};
+}
 
 function init()
 {
