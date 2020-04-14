@@ -3,16 +3,19 @@ const PanelMenu = imports.ui.panelMenu;
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 const Meta = imports.gi.Meta;
+const Lang = imports.lang;
 
 let activities;
 let button;
 
 
-class ActivitiesIcons extends PanelMenu.Button
-{
+const ActivitiesIcons = new Lang.Class({
+    Name: 'ActivitiesIcons',
+    Extends: PanelMenu.Button,
+
     _init()
     {
-        super._init(0.0, null, true);
+        this.parent(0.0, null, true);
 
         this.wm = global.workspace_manager;
 
@@ -33,13 +36,12 @@ class ActivitiesIcons extends PanelMenu.Button
         this.box.add_actor(this.overButton);
 
         this.actor.add_child(this.box);
-    }
+    },
 
     destroy()
     {
-        if (super.destroy)
-            super.destroy();
-    }
+        this.parent();
+    },
 
     _changePage(appsButtonChecked)
     {
@@ -56,7 +58,7 @@ class ActivitiesIcons extends PanelMenu.Button
             Main.overview.show();
         else
             Main.overview.viewSelector._showAppsButtonToggled();
-    }
+    },
 
     _scrollWindows(actor, event)
     {
@@ -77,7 +79,7 @@ class ActivitiesIcons extends PanelMenu.Button
         }
 
         return Clutter.EVENT_STOP;
-    }
+    },
 
     _scrollWorkspace(actor, event)
     {
@@ -101,7 +103,7 @@ class ActivitiesIcons extends PanelMenu.Button
 
         return Clutter.EVENT_STOP;
     }
-}
+});
 
 function init()
 {
