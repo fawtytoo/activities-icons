@@ -33,14 +33,12 @@ const ActivitiesIcons = new Lang.Class({
         this.appButton.child = new St.Icon({reactive: true, track_hover: true, icon_name: 'view-app-grid-symbolic', style_class: 'system-status-icon activity-icon'});
         this.appButton.connect('clicked', () => this._changePage(true));
         this.appButton.connect('scroll-event', (actor, event) => this._scrollWindows(actor, event));
-        this.appButton.child.connect("notify::hover", (widget) => {widget.style_class = (widget.hover) ? "activity-icon-hover" : "activity-icon"});
         this.box.add_actor(this.appButton);
 
         this.overButton = new St.Button();
         this.overButton.child = new St.Icon({reactive: true, track_hover: true, icon_name: 'focus-windows-symbolic', style_class: 'system-status-icon activity-icon'});
         this.overButton.connect('clicked', () => this._changePage(false));
         this.overButton.connect('scroll-event', (actor, event) => this._scrollWorkspace(actor, event));
-        this.overButton.child.connect("notify::hover", (widget) => {widget.style_class = (widget.hover) ? "activity-icon-hover" : "activity-icon"});
         this.box.add_actor(this.overButton);
 
         this.actor.add_child(this.box);

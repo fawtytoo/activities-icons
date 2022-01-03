@@ -9,12 +9,12 @@
     padding: 1pt;
     icon-size: 16pt;
     width: 18pt;
+    color: #ddd;
 }
 
-.activity-icon-hover
+.activity-icon:hover
 {
-    padding-left: 1pt;
-    padding-right: 1pt;
+    padding: 0 1pt 0 1pt;
     icon-size: 18pt;
-    width: 18pt;
+    color: white;
 }
