@@ -3,7 +3,7 @@ const PanelMenu = imports.ui.panelMenu;
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 const Meta = imports.gi.Meta;
-const Lang = imports.lang;
+const GObject = imports.gi.GObject;
 const Config = imports.misc.config;
 const Version = parseInt(Config.PACKAGE_VERSION.split('.')[0]);
 
@@ -17,13 +17,13 @@ const DirForward = Version == 3 ? Meta.MotionDirection.DOWN : Meta.MotionDirecti
 let activities;
 let button;
 
-const ActivitiesIcons = new Lang.Class({
-    Name: 'ActivitiesIcons',
-    Extends: PanelMenu.Button,
-
+const ActivitiesIcons = GObject.registerClass({
+    GTypeName: 'ActivitiesIcons'
+}, class ActivitiesIcons extends PanelMenu.Button
+{
     _init()
     {
-        this.parent(0.0, null, true);
+        super._init(0.0, null, true);
 
         this.wm = global.workspace_manager;
 
@@ -42,12 +42,12 @@ const ActivitiesIcons = new Lang.Class({
         this.box.add_actor(this.overButton);
 
         this.actor.add_child(this.box);
-    },
+    }
 
     destroy()
     {
-        this.parent();
-    },
+        super.destroy();
+    }
 
     _changePage(appsButtonChecked)
     {
@@ -72,7 +72,7 @@ const ActivitiesIcons = new Lang.Class({
             ShowAppsButton.checked = appsButtonChecked;
             MainOverview._onShowAppsButtonToggled();
         }
-    },
+    }
 
     _scrollWindows(actor, event)
     {
@@ -93,7 +93,7 @@ const ActivitiesIcons = new Lang.Class({
         }
 
         return Clutter.EVENT_STOP;
-    },
+    }
 
     _scrollWorkspace(actor, event)
     {
@@ -127,6 +127,7 @@ function init()
 function enable()
 {
     button = new ActivitiesIcons();
+    button.remove_style_class_name("panel-button:hover");
 
     activities.container.hide();
     Main.panel.addToStatusArea('activitiesicons', button, 0, 'left');
